@@ -1,4 +1,4 @@
-import ruamel.yaml as yaml
+from ruamel.yaml import YAML
 import csv
 import random
 from datetime import datetime
@@ -143,15 +143,16 @@ def generate_cde(template_file, row_count, relationship_file=None, output_path=N
     :param output_path: Output path of the generated synthetic CDE file
     :type output_path: str
     """
+    yaml = YAML(typ='safe', pure=True)
     with open(template_file, "r") as f:
-        template = yaml.round_trip_load(f)
+        template = yaml.load(f)
 
     if relationship_file is None:
         relationship_file = template.get("relationships")
         
     if relationship_file is not None:
         with open(relationship_file, "r") as f:
-            relationships = yaml.round_trip_load(f)
+            relationships = yaml.load(f)
     else:
         relationships = {
             "relationships": []
@@ -195,7 +196,7 @@ if __name__ == "__main__":
         "--template",
         help="CDE template specifying how to generate the mock CDE",
         action="store",
-        default="cde_template.yaml"
+        default="test_cde_template.yaml"
     )
     parser.add_argument(
         "-r",
@@ -210,14 +211,14 @@ if __name__ == "__main__":
         help="Number of rows of synthetic CDE data to generate.",
         action="store",
         type=int,
-        default=None
+        default=1000
     )
     parser.add_argument(
         "-o",
         "--output_path",
         help="Output path of synthetic CDE file",
         action="store",
-        default=None
+        default="test_synthetic_cde.csv"
     )
 
     args = parser.parse_args()
